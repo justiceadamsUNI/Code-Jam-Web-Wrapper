@@ -1,17 +1,21 @@
 package adams.justice.myapplication;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.view.Window;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ProgressBar;
 
 public class MainActivity extends AppCompatActivity {
     WebView browserView;
+    ProgressDialog mProgress;
     String mCurrentUrl;
 
     @Override
@@ -80,8 +84,18 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onPageStarted(WebView view, String url, Bitmap favicon) {
+            mProgress = new ProgressDialog(MainActivity.this, R.style.MyTheme);
+            mProgress.show();
+
             mCurrentUrl = url;
             super.onPageStarted(view, url, favicon);
+        }
+
+        @Override
+        public void onPageFinished(WebView view, String url) {
+            mProgress.hide();
+
+            super.onPageFinished(view, url);
         }
     }
 }
