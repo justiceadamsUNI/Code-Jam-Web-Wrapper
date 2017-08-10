@@ -15,7 +15,6 @@ Second Note: Because our code jam project was internally developed, it was inter
 principal.com for the purpose of this repo. I wish I could show you the teams real work! Anyway here's a screenshot of the app
 loading a bootstrap website. ([Principals website](https://www.principal.com/)).
 
-![Screenshot](http://imgur.com/d4AYbiw)
-
+![Screenshot](http://i.imgur.com/d4AYbiw.png?2)
 
 If you need assistance, contact me!
