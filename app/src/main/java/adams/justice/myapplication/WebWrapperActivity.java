@@ -4,19 +4,25 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
 import android.view.Window;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.ProgressBar;
 
-public class MainActivity extends AppCompatActivity {
-    WebView browserView;
-    ProgressDialog mProgress;
-    String mCurrentUrl;
+import java.util.Optional;
+import java.util.function.Consumer;
+
+public class WebWrapperActivity extends AppCompatActivity {
+
+    //The word to check against in the URL's
+    private static final String APP_ROOT_STRING = "principal";
+    private static final String HOMEPAGE_URL = "https://www.principal.com/";
+
+    private WebView browserView;
+    private ProgressDialog mProgress;
+    private String mCurrentUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,28 +31,33 @@ public class MainActivity extends AppCompatActivity {
 
         //Init
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_web_wrapper);
         setUpToolbar();
         setUpBrowserView();
 
-        //The website which is loaded to the webview
-        browserView.loadUrl("https://justiceadamsuni.github.io/index.html"); // ToDo: changeUrl
-        mCurrentUrl = "https://justiceadamsuni.github.io/index.html";  // ToDo: changeUrl
+        //Load Website
+        browserView.loadUrl(HOMEPAGE_URL);
+        mCurrentUrl = HOMEPAGE_URL;
     }
 
     private void setUpToolbar() {
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-        getSupportActionBar().setIcon(R.drawable.toolbar_icon);
-        getSupportActionBar().setTitle("   Advisor Match");
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        Optional<ActionBar> supportActionBar = Optional.of(getSupportActionBar());
+        supportActionBar.ifPresent(new Consumer<ActionBar>() {
+            @Override
+            public void accept(ActionBar actionBar) {
+                actionBar.setIcon(R.drawable.toolbar_icon);
+                actionBar.setTitle("   Advisor Match");
+                actionBar.setDisplayHomeAsUpEnabled(true);
+                actionBar.setDisplayShowHomeEnabled(true);
+            }
+        });
     }
 
     private void setUpBrowserView() {
         browserView = (WebView)findViewById(R.id.webkit);
 
-        //Enable Javascripts
+        //Enable Javascript
         browserView.getSettings().setJavaScriptEnabled(true);
-
         browserView.setWebViewClient(new MyWebViewClient());
         browserView.setVerticalScrollBarEnabled(false);
         browserView.setHorizontalScrollBarEnabled(false);
@@ -55,9 +66,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onSupportNavigateUp() {
-        boolean isHomePage = mCurrentUrl.contains("justiceadamsuni.github.io/index") || mCurrentUrl.contains("cornerstone2k16");
-        Log.d("LOGZ : up", Boolean.toString(isHomePage) + "URL: " + mCurrentUrl);
-        if (!isHomePage) { // ToDo: changeUrl
+        boolean isHomePage = mCurrentUrl.equals(HOMEPAGE_URL);
+        if (!isHomePage) {
             browserView.goBack();
         } else {
             //Close the app
@@ -71,10 +81,9 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
-            mCurrentUrl = url; // ToDo: changeUrl
+            mCurrentUrl = url;
 
-            Log.d("LOGZ", url);
-            if (!url.contains("justiceadamsuni.github.io")) { // ToDo: changeUrl
+            if (!url.toLowerCase().contains(APP_ROOT_STRING.toLowerCase())) {
                 view.getContext().startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
 
                 return true;
@@ -84,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onPageStarted(WebView view, String url, Bitmap favicon) {
-            mProgress = new ProgressDialog(MainActivity.this, R.style.MyTheme);
+            mProgress = new ProgressDialog(WebWrapperActivity.this, R.style.MyTheme);
             mProgress.show();
 
             mCurrentUrl = url;
